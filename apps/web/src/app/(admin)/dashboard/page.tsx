@@ -105,6 +105,7 @@ export default function Dashboard() {
   const { user } = useContext(AuthContext);
   const userRole = user?.role;
   const [page, setPage] = useState(1);
+  const [pageSR, setPageSR] = useState(1);
   const [categoryF, setCategoryF] = useState('');
   const [productF, setProductF] = useState('');
   const [warehouseF, setWarehouseF] = useState('');
@@ -202,17 +203,31 @@ export default function Dashboard() {
   const { data: stockOverview } = useReportStockOverview(warehouseF, monthF);
   const overviewStockData = stockOverview?.data.data;
   const dataBar = Array(overviewStockData);
-
+  const limitSR = 8;
   //stock report list
-  const { data: stocked } = useReportStock(warehouseF, monthF);
-  const stockList: stockReportList[] = stocked?.data.data || [];
-
+  const { data: stocked, isPlaceholderData: placeholderSR } = useReportStock(
+    warehouseF,
+    monthF,
+    pageSR,
+    limitSR,
+  );
+  const stockList: stockReportList[] = stocked?.data.data.report || [];
+  const stockListPages = stocked?.data?.data?.totalPages;
   //modal see detail stock journal report
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [detailMsg, setDetalMsg] = useState('');
   const handleSeeDetailMessage = (msg: string) => {
     setDetalMsg(msg);
     onOpen();
+  };
+
+  const handlePaginateSR = (type: string): void => {
+    if (type === 'next') {
+      setPageSR((old: number) => old + 1);
+    }
+    if (type === 'prev') {
+      setPageSR((old: number) => Math.max(old - 1, 1));
+    }
   };
   return (
     <Stack gap={50} p={20}>
@@ -505,6 +520,12 @@ export default function Dashboard() {
               </Tbody>
             </Table>
           </TableContainer>
+          <Paginate
+            totalPages={stockListPages}
+            handleClickButton={handlePaginateSR}
+            page={pageSR}
+            isPlaceholderData={placeholderSR}
+          />
         </Box>
       </Box>
       <Modal isOpen={isOpen} onClose={onClose} isCentered>

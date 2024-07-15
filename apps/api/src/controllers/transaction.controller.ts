@@ -87,6 +87,19 @@ export class TransactionController {
     }
   };
 
+  public cronUpdateStatus = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      await this.transactionService.cronUpdateStatus();
+    } catch (error) {
+      console.error('Error', error);
+      next(error);
+    }
+  };
+
   public acceptTransactionOrder = async (
     req: Request,
     res: Response,
@@ -142,6 +155,7 @@ export class TransactionController {
     try {
       const userId = parseInt(req.body.userId as string, 10);
       const role = req.body.role as string;
+      const searchDate = req.body.searchDate as string;
 
       if (isNaN(userId) || !role) {
         throw new Error('Invalid userId or role');
@@ -150,6 +164,7 @@ export class TransactionController {
       const transactions = await this.transactionService.getAdminTransactions(
         userId,
         role,
+        searchDate,
       );
       res.status(200).json(transactions);
     } catch (error) {

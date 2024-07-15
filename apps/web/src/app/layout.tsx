@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
-import ReactQueryProvider from './utils/reactQueryProvider';
-import { Providers } from '@/utils/providerStyle';
-import { AuthProvider } from '@/context/Auth';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -16,12 +18,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <ReactQueryProvider>
-          <Providers>
-            <AuthProvider>{children}</AuthProvider>
-          </Providers>
-        </ReactQueryProvider>
+      <body className={inter.className}>
+        <Header />
+        {children}
+        <Footer />
       </body>
     </html>
   );
